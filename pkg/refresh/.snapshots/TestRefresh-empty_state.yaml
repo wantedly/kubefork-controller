@@ -1,0 +1,6 @@
+---
+apiVersion: apps/v1
+items: null
+kind: DeploymentList
+metadata: {}
+

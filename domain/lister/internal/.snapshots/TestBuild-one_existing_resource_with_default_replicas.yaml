@@ -1,0 +1,115 @@
+---
+GroupVersionKind:
+  Group: duplication.k8s.wantedly.com
+  Kind: DeploymentCopyList
+  Version: v1beta1
+items:
+  - metadata:
+      creationTimestamp: null
+      name: deploy-2-some-fork
+      namespace: some-namespace
+    spec:
+      customAnnotations:
+        some-annotation-added-to-copied-deployment: "true"
+      customLabels:
+        fork.k8s.wantedly.com/identifier: some-identifier
+        fork.k8s.wantedly.com/routed-from-service-1: "true"
+        fork.k8s.wantedly.com/routed-from-service-2: "true"
+        some-label-added-to-copied-deployment: "true"
+      hostname: ""
+      nameSuffix: some-fork
+      replicas: 1
+      targetContainers: null
+      targetDeploymentName: deploy-2
+    status: {}
+  - metadata:
+      creationTimestamp: null
+      name: deploy-1-some-fork
+      namespace: some-namespace
+    spec:
+      customAnnotations:
+        some-annotation-added-to-copied-deployment: "true"
+      customLabels:
+        fork.k8s.wantedly.com/identifier: some-identifier
+        fork.k8s.wantedly.com/routed-from-service-1: "true"
+        fork.k8s.wantedly.com/routed-from-service-2: "true"
+        some-label-added-to-copied-deployment: "true"
+      hostname: ""
+      nameSuffix: some-fork
+      replicas: 1
+      targetContainers: null
+      targetDeploymentName: deploy-1
+    status: {}
+
+---
+GroupVersionKind:
+  Group: ""
+  Kind: ServiceList
+  Version: v1
+items:
+  - metadata:
+      creationTimestamp: null
+      labels:
+        fork.k8s.wantedly.com/identifier: some-identifier
+        fork.k8s.wantedly.com/original-service-name: service-2
+      name: service-2-some-fork
+      namespace: some-namespace
+    spec:
+      ports:
+        - name: http
+          port: 80
+          protocol: TCP
+          targetPort: 8081
+      selector:
+        fork.k8s.wantedly.com/identifier: some-identifier
+        fork.k8s.wantedly.com/routed-from-service-2: "true"
+      type: ClusterIP
+    status:
+      loadBalancer: {}
+  - metadata:
+      creationTimestamp: null
+      labels:
+        fork.k8s.wantedly.com/identifier: some-identifier
+        fork.k8s.wantedly.com/original-service-name: service-1
+      name: service-1-some-fork
+      namespace: some-namespace
+    spec:
+      ports:
+        - name: http
+          port: 80
+          protocol: TCP
+          targetPort: 8081
+      selector:
+        fork.k8s.wantedly.com/identifier: some-identifier
+        fork.k8s.wantedly.com/routed-from-service-1: "true"
+      type: ClusterIP
+    status:
+      loadBalancer: {}
+
+---
+GroupVersionKind:
+  Group: fork.k8s.wantedly.com
+  Kind: VSConfigList
+  Version: v1beta1
+items:
+  - metadata:
+      creationTimestamp: null
+      name: service-2-some-fork
+      namespace: some-namespace
+    spec:
+      headerName: fork-identifier
+      headerValue: some-identifier
+      host: service-2
+      service: service-2-some-fork
+    status: {}
+  - metadata:
+      creationTimestamp: null
+      name: service-1-some-fork
+      namespace: some-namespace
+    spec:
+      headerName: fork-identifier
+      headerValue: some-identifier
+      host: service-1
+      service: service-1-some-fork
+    status: {}
+

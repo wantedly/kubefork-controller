@@ -1,0 +1,30 @@
+---
+apiVersion: getambassador.io/v2
+items: null
+kind: MappingList
+metadata: {}
+
+---
+apiVersion: duplication.k8s.wantedly.com/v1beta1
+items: null
+kind: DeploymentCopyList
+metadata: {}
+
+---
+apiVersion: v1
+items: null
+kind: ServiceList
+metadata: {}
+
+---
+apiVersion: fork.k8s.wantedly.com/v1beta1
+items: null
+kind: VSConfigList
+metadata: {}
+
+---
+apiVersion: fork.k8s.wantedly.com/v1beta1
+items: null
+kind: ForkList
+metadata: {}
+

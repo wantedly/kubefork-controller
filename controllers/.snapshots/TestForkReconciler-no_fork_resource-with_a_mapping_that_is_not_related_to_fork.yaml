@@ -1,0 +1,43 @@
+---
+apiVersion: getambassador.io/v2
+items:
+  - apiVersion: getambassador.io
+    kind: Mapping
+    metadata:
+      creationTimestamp: null
+      name: mapping-not-related-to-fork
+      namespace: ambassador
+    spec:
+      ambassador_id:
+        - some-other-ambassador-id
+      host: www.example.com
+      prefix: /
+      service: backend.example.com
+      timeout_ms: 90000
+kind: MappingList
+metadata: {}
+
+---
+apiVersion: duplication.k8s.wantedly.com/v1beta1
+items: null
+kind: DeploymentCopyList
+metadata: {}
+
+---
+apiVersion: v1
+items: null
+kind: ServiceList
+metadata: {}
+
+---
+apiVersion: fork.k8s.wantedly.com/v1beta1
+items: null
+kind: VSConfigList
+metadata: {}
+
+---
+apiVersion: fork.k8s.wantedly.com/v1beta1
+items: null
+kind: ForkList
+metadata: {}
+

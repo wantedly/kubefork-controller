@@ -1,0 +1,67 @@
+---
+apiVersion: apps/v1
+items:
+  - metadata:
+      creationTimestamp: null
+      labels:
+        some-label-key: "1"
+        this-key-should-be-updated: this-is-after-update
+      name: deploy-1
+      namespace: some-namespace
+      ownerReferences:
+        - apiVersion: v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: Service
+          name: some-svc
+          uid: ""
+    spec:
+      selector:
+        matchLabels:
+          some-label-key: "1"
+          this-key-should-be-updated: this-is-after-update
+      strategy: {}
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            some-label-key: "1"
+            this-key-should-be-updated: this-is-after-update
+        spec:
+          containers:
+            - image: some-deployment:some-commit-sha
+              name: some-deployment
+              resources: {}
+    status: {}
+  - metadata:
+      creationTimestamp: null
+      labels:
+        some-label-key: "2"
+      name: 2-some-svc
+      namespace: some-namespace
+      ownerReferences:
+        - apiVersion: v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: Service
+          name: some-svc
+          uid: ""
+    spec:
+      selector:
+        matchLabels:
+          some-label-key: "2"
+      strategy: {}
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            some-label-key: "2"
+        spec:
+          containers:
+            - image: some-deployment:some-commit-sha
+              name: some-deployment
+              resources: {}
+    status: {}
+kind: DeploymentList
+metadata: {}
+

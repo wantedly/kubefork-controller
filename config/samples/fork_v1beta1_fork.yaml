@@ -1,0 +1,6 @@
+apiVersion: fork.k8s.wantedly.com/v1beta1
+kind: Fork
+metadata:
+  name: fork-sample
+spec:
+  # TODO(user): Add fields here

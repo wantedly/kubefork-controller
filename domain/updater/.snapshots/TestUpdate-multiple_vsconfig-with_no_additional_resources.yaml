@@ -1,0 +1,41 @@
+---
+apiVersion: networking.istio.io/v1beta1
+items:
+  - metadata:
+      creationTimestamp: null
+      labels:
+        fork.k8s.wantedly.com/service: some-service-name
+      name: some-service-name
+      namespace: some-namespace
+      ownerReferences:
+        - apiVersion: v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: Service
+          name: some-service-name
+          uid: ""
+    spec:
+      hosts:
+        - some-service-name
+      http:
+        - match:
+            - headers:
+                some-header-name:
+                  exact: another-identifier
+          route:
+            - destination:
+                host: custom-routing-service-name
+        - match:
+            - headers:
+                some-header-name:
+                  exact: some-identifier
+          route:
+            - destination:
+                host: custom-routing-service-name
+        - route:
+            - destination:
+                host: some-service-name
+    status: {}
+kind: VirtualServiceList
+metadata: {}
+

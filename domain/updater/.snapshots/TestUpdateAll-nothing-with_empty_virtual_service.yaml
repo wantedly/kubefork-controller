@@ -1,0 +1,23 @@
+---
+apiVersion: networking.istio.io/v1beta1
+items:
+  - apiVersion: networking.istio.io/v1beta1
+    kind: VirtualService
+    metadata:
+      creationTimestamp: null
+      name: some-service-name
+      namespace: some-namespace
+      ownerReferences:
+        - apiVersion: v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: Service
+          name: some-service-name
+          uid: ""
+    spec:
+      hosts:
+        - some-service-name
+    status: {}
+kind: VirtualServiceList
+metadata: {}
+

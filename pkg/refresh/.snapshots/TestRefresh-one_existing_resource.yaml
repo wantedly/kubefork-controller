@@ -1,0 +1,59 @@
+---
+apiVersion: apps/v1
+items:
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      creationTimestamp: null
+      labels:
+        some-label-key: "1"
+      name: deploy-1
+      namespace: some-namespace
+    spec:
+      selector:
+        matchLabels:
+          some-label-key: "1"
+      strategy: {}
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            some-label-key: "1"
+        spec:
+          containers:
+            - image: some-deployment:some-commit-sha
+              name: some-deployment
+              resources: {}
+    status: {}
+  - metadata:
+      creationTimestamp: null
+      labels:
+        some-label-key: "2"
+      name: 2-some-svc
+      namespace: some-namespace
+      ownerReferences:
+        - apiVersion: v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: Service
+          name: some-svc
+          uid: ""
+    spec:
+      selector:
+        matchLabels:
+          some-label-key: "2"
+      strategy: {}
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            some-label-key: "2"
+        spec:
+          containers:
+            - image: some-deployment:some-commit-sha
+              name: some-deployment
+              resources: {}
+    status: {}
+kind: DeploymentList
+metadata: {}
+
