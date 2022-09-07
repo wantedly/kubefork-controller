@@ -1,0 +1,64 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.9.2
+  creationTimestamp: null
+  name: vsconfigs.fork.k8s.wantedly.com
+spec:
+  group: fork.k8s.wantedly.com
+  names:
+    kind: VSConfig
+    listKind: VSConfigList
+    plural: vsconfigs
+    singular: vsconfig
+  scope: Namespaced
+  versions:
+  - name: v1beta1
+    schema:
+      openAPIV3Schema:
+        description: VSConfig is the Schema for the vsconfigs API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: VSConfigSpec defines the desired state of VSConfig
+            properties:
+              headerName:
+                description: http header name to check
+                type: string
+              headerValue:
+                description: http header value to route to Service
+                type: string
+              host:
+                description: Target Kubernetes service name to trap requests
+                type: string
+              service:
+                description: 'service to route when receiving http header `HeaderName:
+                  HeaderValue`'
+                type: string
+            required:
+            - headerName
+            - headerValue
+            - host
+            - service
+            type: object
+          status:
+            description: VSConfigStatus defines the observed state of VSConfig
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

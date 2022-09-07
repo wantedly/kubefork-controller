@@ -1,0 +1,24 @@
+# permissions for end users to edit forks.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: fork-editor-role
+rules:
+- apiGroups:
+  - fork.k8s.wantedly.com
+  resources:
+  - forks
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - fork.k8s.wantedly.com
+  resources:
+  - forks/status
+  verbs:
+  - get

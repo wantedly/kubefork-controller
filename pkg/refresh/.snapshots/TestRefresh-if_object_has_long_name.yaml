@@ -1,0 +1,64 @@
+---
+apiVersion: apps/v1
+items:
+  - metadata:
+      creationTimestamp: null
+      labels:
+        some-label-key: random-70-character-objKey-cmFuZG9tLTcwLWNoYXJhY3Rlci1uYW1lCci1uYW1lC
+      name: random-70-character-objKey-cmFuZG9tLTcwLWNoYXJhY3Rlci-some-s
+      namespace: some-namespace
+      ownerReferences:
+        - apiVersion: v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: Service
+          name: some-svc
+          uid: ""
+    spec:
+      selector:
+        matchLabels:
+          some-label-key: random-70-character-objKey-cmFuZG9tLTcwLWNoYXJhY3Rlci1uYW1lCci1uYW1lC
+      strategy: {}
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            some-label-key: random-70-character-objKey-cmFuZG9tLTcwLWNoYXJhY3Rlci1uYW1lCci1uYW1lC
+        spec:
+          containers:
+            - image: some-deployment:some-commit-sha
+              name: some-deployment
+              resources: {}
+    status: {}
+  - metadata:
+      creationTimestamp: null
+      labels:
+        some-label-key: "1"
+      name: random-70-character-name-cmFuZG9tLTcwLWNoYXJhY3Rlci1uYW1lCci1uY
+      namespace: some-namespace
+      ownerReferences:
+        - apiVersion: v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: Service
+          name: some-svc
+          uid: ""
+    spec:
+      selector:
+        matchLabels:
+          some-label-key: "1"
+      strategy: {}
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            some-label-key: "1"
+        spec:
+          containers:
+            - image: some-deployment:some-commit-sha
+              name: some-deployment
+              resources: {}
+    status: {}
+kind: DeploymentList
+metadata: {}
+

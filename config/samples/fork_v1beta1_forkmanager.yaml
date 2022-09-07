@@ -1,0 +1,6 @@
+apiVersion: fork.k8s.wantedly.com/v1beta1
+kind: ForkManager
+metadata:
+  name: forkmanager-sample
+spec:
+  # TODO(user): Add fields here

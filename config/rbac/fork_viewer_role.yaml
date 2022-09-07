@@ -1,0 +1,20 @@
+# permissions for end users to view forks.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: fork-viewer-role
+rules:
+- apiGroups:
+  - fork.k8s.wantedly.com
+  resources:
+  - forks
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - fork.k8s.wantedly.com
+  resources:
+  - forks/status
+  verbs:
+  - get

@@ -1,0 +1,115 @@
+---
+apiVersion: getambassador.io/v2
+items:
+  - metadata:
+      creationTimestamp: null
+      labels:
+        fork.k8s.wantedly.com/manager: default
+      name: some-with-original-example-com-some-identifier
+      namespace: ambassador
+      ownerReferences:
+        - apiVersion: fork.k8s.wantedly.com/v1beta1
+          blockOwnerDeletion: true
+          controller: true
+          kind: ForkManager
+          name: default
+          uid: ""
+    spec:
+      add_request_headers:
+        fork-identifier: some-identifier
+        x-another-header-key: another-header-value
+        x-forwarded-host: '%REQ(:authority)%'
+        x-some-header-key: some-header-value
+      allow_upgrade:
+        - websocket
+      ambassador_id:
+        - ambassador
+      host: some-identifier.some-with-original.example.com
+      host_rewrite: some-with-original.some-namespace
+      prefix: /
+      rewrite: ""
+      service: some-with-original.some-namespace:443
+      timeout_ms: 90000
+  - metadata:
+      creationTimestamp: null
+      labels:
+        fork.k8s.wantedly.com/manager: default
+      name: sandbox-example-com-some-identifier
+      namespace: ambassador
+      ownerReferences:
+        - apiVersion: fork.k8s.wantedly.com/v1beta1
+          blockOwnerDeletion: true
+          controller: true
+          kind: ForkManager
+          name: default
+          uid: ""
+    spec:
+      add_request_headers:
+        fork-identifier: some-identifier
+        x-another-header-key: another-header-value
+        x-forwarded-host: '%REQ(:authority)%'
+        x-some-header-key: some-header-value
+      allow_upgrade:
+        - websocket
+      ambassador_id:
+        - ambassador
+      host: some-identifier.sandbox.example.com
+      prefix: /
+      rewrite: ""
+      service: https://sandbox.example.com
+      timeout_ms: 90000
+  - apiVersion: getambassador.io
+    kind: Mapping
+    metadata:
+      creationTimestamp: null
+      name: mapping-not-related-to-fork
+      namespace: ambassador
+    spec:
+      ambassador_id:
+        - some-other-ambassador-id
+      host: www.example.com
+      prefix: /
+      service: backend.example.com
+      timeout_ms: 90000
+kind: MappingList
+metadata: {}
+
+---
+apiVersion: duplication.k8s.wantedly.com/v1beta1
+items: null
+kind: DeploymentCopyList
+metadata: {}
+
+---
+apiVersion: v1
+items: null
+kind: ServiceList
+metadata: {}
+
+---
+apiVersion: fork.k8s.wantedly.com/v1beta1
+items: null
+kind: VSConfigList
+metadata: {}
+
+---
+apiVersion: fork.k8s.wantedly.com/v1beta1
+items:
+  - apiVersion: vsconfig.k8s.wantedly.com/v1beta1
+    kind: Fork
+    metadata:
+      creationTimestamp: null
+      name: some-identifier
+      namespace: some-namespace
+    spec:
+      deadline: "2009-11-10T23:10:00Z"
+      gatewayOptions:
+        addRequestHeaders:
+          x-another-header-key: another-header-value
+          x-some-header-key: some-header-value
+      identifier: some-identifier
+      manager: ambassador/default
+    status: {}
+kind: ForkList
+metadata: {}
+

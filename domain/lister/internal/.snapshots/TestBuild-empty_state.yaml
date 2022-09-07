@@ -1,0 +1,21 @@
+---
+GroupVersionKind:
+  Group: duplication.k8s.wantedly.com
+  Kind: DeploymentCopyList
+  Version: v1beta1
+items: []
+
+---
+GroupVersionKind:
+  Group: ""
+  Kind: ServiceList
+  Version: v1
+items: []
+
+---
+GroupVersionKind:
+  Group: fork.k8s.wantedly.com
+  Kind: VSConfigList
+  Version: v1beta1
+items: []
+
