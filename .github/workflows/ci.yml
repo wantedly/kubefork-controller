@@ -16,8 +16,8 @@ jobs:
       - name: Build and push docker image
         uses: docker/build-push-action@v1
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          username: ${{ secrets.ORG_SHARED_K8S_DEPLOY_DOCKER_USERNAME }}
+          password: ${{ secrets.ORG_SHARED_K8S_DEPLOY_DOCKER_PASSWORD }}
           repository: wantedly/kubefork-controller
           registry: quay.io
           tags: ${{ github.sha }}
