@@ -50,13 +50,68 @@ kubeforkではさらに
 
 以下、[カスタムリソース・カスタムコントローラー](https://kubernetes.io/ja/docs/concepts/extend-kubernetes/api-extension/custom-resources/)の知識を前提とします。
 
-まず、kubeforkを行いたいクラスタに[kubefork-controller](https://github.com/wantedly/kubefork-controller)・[deployment-duplicator](https://github.com/wantedly/deployment-duplicator)・[Istio](https://github.com/istio/istio)・[Edge Stack](https://github.com/datawire/edge-stack)を導入し、ForkManagerリソースをapplyしておきます。一度これらを導入してしまえば、Forkリソースをapplyするだけでkubeforkを行うことができます。kubeforkを行う流れは以下のようになっています。kubefork-controllerはFork・ForkManagerリソースから、Mapping・DeploymentCopy・VirtualService・kubeforkされたServiceリソースを生成し、deployment-duplicatorはDeploymentCopyからkubeforkされたDeploymentリソースを生成します。
+まず、kubeforkを行いたいクラスタに[kubefork-controller](https://github.com/wantedly/kubefork-controller)・[deployment-duplicator](https://github.com/wantedly/deployment-duplicator)・[Istio](https://github.com/istio/istio)・[Edge Stack](https://github.com/datawire/edge-stack)を導入し、ForkManagerリソースをapplyしておきます。一度これらを導入してしまえば、Forkリソースをapplyするだけでkubeforkを行うことができます。kubeforkを行う流れは以下のようになっています。kubefork-controllerはFork・ForkManagerリソースから、Mapping・DeploymentCopy・VirtualServiceリソースとServiceのコピーを生成し、deployment-duplicatorはDeploymentCopyからDeploymentのコピーを生成します。
 
 ![img.png](img/resources.png)
 
-kubefork-controllerとdeployment-duplicatorが生成したMapping・Service・Deployment・VirtualServiceリソースによって、仮想クラスタが実現されます。
+Forkリソースをapplyし、Mapping・Service・Deployment・VirtualServiceリソースが生成されることで、仮想クラスタが実現されます。Forkリソースのマニフェストは[kubefork-ctl](https://github.com/wantedly/kubefork-controller/tree/main/kubeforkctl)を用いて生成できます。
 
 #### Fork
+
+何を対象にしてどのようにkubeforkするかを表すリソースです。マニフェストではコピーするService・DeploymentやForkManager、コピーしたコンテナに適用する環境変数やDockerイメージを指定します（ForkManagerは必須です）。
+
+```yaml
+apiVersion: vsconfig.k8s.wantedly.com/v1beta1
+kind: Fork
+metadata:
+  labels:
+    fork.k8s.wantedly.com/identifier: some-identifier
+  name: kubefork-some-identifier
+  namespace: some-namespace
+spec:
+  # Forkリソースが有効な時間
+  deadline: "2022-09-01T00:00:00Z"
+  # DeploymentCopyの情報
+  deployments:
+    replicas: 1
+    # どのdeploymentをコピーするかのセレクタ
+    selector:
+      matchExpressions:
+      - key: some-key
+        operator: Exists
+    template:
+      metadata:
+        annotations:
+          some-annotation: value1
+        labels:
+          app: some-identifier
+          role: fork
+      spec:
+        containers:
+        - env:
+            # コピーされたコンテナへ追加する環境変数
+          - name: FORK_IDENTIFIER
+            value: some-identifier
+          # コピーしたコンテナに適用するDockerイメージ
+          image: some-name:some-tag
+          name: container1
+          resources: {}
+        - env:
+          - name: FORK_IDENTIFIER
+            value: some-identifier
+          image: some-name:some-tag
+          name: container2
+          resources: {}
+  identifier: some-identifier
+  # ForkManagerの指定（<ForkManagerのNamespace>:<ForkManagerの名前>）
+  manager: manager-namespace/manager-name
+  # どのServiceをコピーするかのセレクタ
+  services:
+    selector:
+      matchLabels:
+        some-label: value2
+status: {}
+```
 
 #### ForkManager
 
@@ -67,10 +122,10 @@ apiVersion: getambassador.io/v2
 kind: Mapping
 spec:
   add_request_headers:
-    x-fork-identifier: identifier
+    x-fork-identifier: some-identifier
   ambassador_id:
   - fork-ambassador
-  host: identifier.example.com
+  host: some-identifier.example.com
   host_rewrite: example.com
 ```
 
