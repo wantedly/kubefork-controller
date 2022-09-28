@@ -4,8 +4,8 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	"github.com/wantedly/kubefork/domain"
-	"github.com/wantedly/kubefork/k8sClientGo"
+	"github.com/wantedly/kubefork-controller/kubeforkctl/domain"
+	"github.com/wantedly/kubefork-controller/kubeforkctl/k8sClientGo"
 )
 
 type manifestOption struct {

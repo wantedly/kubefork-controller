@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"github.com/wantedly/kubefork/client"
-	"github.com/wantedly/kubefork/lib"
+	"github.com/wantedly/kubefork-controller/kubeforkctl/client"
+	"github.com/wantedly/kubefork-controller/kubeforkctl/lib"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"

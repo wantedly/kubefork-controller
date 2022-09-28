@@ -1,4 +1,4 @@
-module github.com/wantedly/kubefork
+module github.com/wantedly/kubefork-controller/kubeforkctl
 
 go 1.19
 
