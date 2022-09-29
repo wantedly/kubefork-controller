@@ -17,7 +17,7 @@ type Fork struct {
 	f *v1beta1.Fork
 }
 
-func NewFork(identifier, namespace, forkManagerName string, replicaNum int32, serviceSelector, deploymentSelector *metav1.LabelSelector,
+func NewFork(identifier, namespace, forkManagerName string, replicaNum int32, validTime time.Duration, serviceSelector, deploymentSelector *metav1.LabelSelector,
 	containers []v1.Container, deploymentAnnotation map[string]string) Fork {
 	fork := v1beta1.Fork{
 		TypeMeta: metav1.TypeMeta{
@@ -33,7 +33,7 @@ func NewFork(identifier, namespace, forkManagerName string, replicaNum int32, se
 			Manager:    forkManagerName,
 			Identifier: identifier,
 			Deadline: &metav1.Time{
-				Time: time.Now().Add(time.Hour * 1),
+				Time: time.Now().Add(time.Hour * validTime),
 			},
 			Services: &v1beta1.ForkService{
 				Selector: serviceSelector, // this field depends on '--service-label' and '--service-name' options
