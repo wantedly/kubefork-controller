@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"os"
+	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/wantedly/kubefork-controller/kubeforkctl/domain"
@@ -21,6 +22,7 @@ type manifestOption struct {
 	image                string
 	env                  map[string]string
 	forkManagerName      string
+	validTime            int64
 	kubeConfigPath       string
 }
 
@@ -58,6 +60,7 @@ Deployment-duplicator create forked Deployment from DeploymentCopy.
 	cmd.Flags().StringVar(&opt.image, "image", "", "image of forked container\n(support '<name>:<tag>' format)")
 	cmd.Flags().StringToStringVarP(&opt.env, "env", "e", map[string]string{}, "custom env vars for forked containers which ")
 	cmd.Flags().StringVarP(&opt.forkManagerName, "fork-manager", "f", "", "name of fork manager\n(support '<namespace>/<name>' format)")
+	cmd.Flags().Int64VarP(&opt.validTime, "valid-time", "v", 8, "valid time of fork resource (hour)")
 	cmd.Flags().StringVarP(&opt.kubeConfigPath, "kubeconfig", "k", os.Getenv("KUBECONFIG"), "path of kubeconig\n(loading order follows the same rule as kubectl)")
 
 	return cmd
@@ -109,7 +112,7 @@ func (m manifestCmdRunner) manifestRun(cmd *cobra.Command, _ []string) error {
 	}
 	containers := domain.NewContainers(m.option.image, containerNames, env)
 
-	f := domain.NewFork(m.option.identifier, m.option.namespace, m.option.forkManagerName, m.option.replicaNum, serviceSelector, deploymentSelector,
+	f := domain.NewFork(m.option.identifier, m.option.namespace, m.option.forkManagerName, m.option.replicaNum, time.Duration(m.option.validTime), serviceSelector, deploymentSelector,
 		containers, m.option.deploymentAnnotation)
 
 	if err := f.OutputManifest(m.option.outputPath); err != nil {
