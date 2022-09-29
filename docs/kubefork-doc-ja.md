@@ -56,9 +56,13 @@ kubeforkではさらに
 
 Forkリソースをapplyし、Mapping・Service・Deployment・VirtualServiceリソースが生成されることで、仮想クラスタが実現されます。Forkリソースのマニフェストは[kubefork-ctl](https://github.com/wantedly/kubefork-controller/tree/main/kubeforkctl)を用いて生成できます。
 
+##### NOTE
+
+ヘッダによって通信をどのサービスに割り振るかを判定するため、サービス間のすべての通信に`x-fork-identifier:identifier`といったヘッダが付いている必要があります。各サービスは、受け取った通信に`x-fork-identifier:identifier`というヘッダが付いていた場合、他のサービスへの通信にも`x-fork-identifier:identifier`ヘッダを伝播させなければなりませんが、現時点で**kubeforkにはヘッダ伝播機能はありません**。そのため、**ユーザは特定のヘッダを伝播させる機能をアプリケーションに搭載する必要があります**。
+
 #### Fork
 
-何を対象にしてどのようにkubeforkするかを表すリソースです。マニフェストではコピーするService・DeploymentやForkManager、コピーしたコンテナに適用する環境変数やDockerイメージを指定します（ForkManagerは必須です）。
+何を対象にしてどのようにkubeforkするかを表すリソースです。マニフェストではコピーするService・DeploymentやForkManager、コピーしたコンテナに適用する環境変数やDockerイメージを指定します（ForkManagerは必須です）。マニフェストは[kubefork-ctl](https://github.com/wantedly/kubefork-controller/tree/main/kubeforkctl)を用いて生成できます。
 
 ```yaml
 apiVersion: vsconfig.k8s.wantedly.com/v1beta1
@@ -115,27 +119,146 @@ status: {}
 
 #### ForkManager
 
+通信の振り分けに用いるヘッダやどのホストに来た通信をどのサービスに送るか、ambassadorIDを設定します。
+
+##### NOTE
+
+現時点では、kubefork-cliのようなマニフェストを生成できるツールがForkManagerリソースには存在しないため、ユーザはForkManagerリソースのマニフェストを自ら記述する必要があります。
+
+```yaml
+apiVersion: vsconfig.k8s.wantedly.com/v1beta1
+kind: ForkManager
+metadata:
+  name: manager-name
+  namespace: manager-namespace
+spec:
+  ambassadorID: fork-ambassador
+  # 通信の振り分けに用いるヘッダの指定
+  headerKey: x-fork-identifier
+  upstreams:
+    # どのホストに来た通信をどのサービスに送るか
+  - host: example1.com
+    original: service1
+  - host: example2.com
+    original: service2:80
+```
+
 #### Mapping
+
+サブドメインをヘッダに付け替える操作を行います。このリソースはkubefork-controllerによって自動生成されます。
+
+Mappingリソースの詳しい仕様については[Edge Stack](https://github.com/datawire/edge-stack)を参照してください。
 
 ```yaml
 apiVersion: getambassador.io/v2
 kind: Mapping
 spec:
   add_request_headers:
+    # identifierをヘッダに追加
     x-fork-identifier: some-identifier
   ambassador_id:
   - fork-ambassador
+  # identifierをホストから削除
   host: some-identifier.example.com
   host_rewrite: example.com
 ```
 
 #### VirtualService
 
+ヘッダによって通信をするサービスを振り分ける操作を行います。このリソースはkubefork-controllerによって自動的に生成・更新されます。
+
+VirtualServiceリソースの詳しい仕様については[Istio](https://github.com/istio/istio)を参照してください。
+
+```yaml
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: some-virtualservice
+  namespace: some-namespace
+spec:
+  hosts:
+  # 通信が送られてくるサービス
+  - example
+  http:
+  - match:
+    # ヘッダの値とそれに対応する振り分け先のサービス
+    - headers:
+        x-fork-identifier:
+          exact: some-identifier1
+    route:
+    - destination:
+        host: kubefork-some-identifier1-example
+  - match:
+    - headers:
+        x-fork-identifier:
+          exact: some-identifier2
+    route:
+    - destination:
+        host: kubefork-some-identifier2-example
+  - route:
+    # どれにも当てはまらない場合の振り分け先
+    - destination:
+        host: example
+```
+
 #### DeploymentCopy
 
-詳しくは https://github.com/wantedly/deployment-duplicator を参照してください。
+Deploymentのコピーを生成するためのリソースです。マニフェストにはすでに存在するDeploymentリソースとの差分を記述します。そうすることで、deployment-duplicatorが元のDeploymentリソースとその差分を持つ新たなDeploymentリソースを生成します。このリソースはkubefork-controllerによって自動生成されます。
+
+DeploymentCopyリソースの詳しい仕様については[deployment-duplicator](https://github.com/wantedly/deployment-duplicator)を参照してください。
+
+```yaml
+apiVersion: duplication.k8s.wantedly.com/v1beta1
+kind: DeploymentCopy
+metadata:
+  name: some-deployment-kubefork-some-identifier
+  namespace: some-namespace
+spec:
+  # コピーしたDeploymentに付けるラベル
+  customLabels:
+    app: some-identifier
+    fork.k8s.wantedly.com/identifier: some-identifier
+    role: fork
+  hostname: ""
+  nameSuffix: kubefork-some-identifier
+  replicas: 1
+  # コンテナの変更点
+  targetContainers:
+    - env:
+      - name: FORK_IDENTIFIER
+        value: some-identifier
+      image: some-name:some-tag
+      name: container1
+      resources: {}
+    - env:
+      - name: FORK_IDENTIFIER
+        value: some-identifier
+      image: some-name:some-tag
+      name: container2
+      resources: {}
+  # コピー元となるDeploymentリソース名
+  targetDeploymentName: some-deployment
+```
 
 #### VSConfig
+
+VirtualServiceリソースを生成するためのリソースです。このリソースは新たにkubeforkが行われるために生成されます。kubefork-controllerは存在するすべてのVSConfigリソースを基に1つのVirtualServiceリソースを生成します。このリソースはkubefork-controllerによって自動生成されます。
+
+```yaml
+apiVersion: vsconfig.k8s.wantedly.com/v1beta1
+kind: VSConfig
+metadata:
+  name: example-kubefork-some-identifier
+  namespace: some-namespace
+spec:
+  # 振り分けるためのヘッダの情報
+  headerName: x-fork-identifier
+  headerValue: some-identifier
+  # どのサービスに来た通信をどのサービスに振り分けるか
+  host: example
+  service: example-kubefork-some-identifier
+status: {}
+```
 
 ## 参考文献
 
