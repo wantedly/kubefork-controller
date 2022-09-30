@@ -1,6 +1,9 @@
 # kubefork-controller
 Development experience like copying your own kubernetes cluster from shared kubernetes cluster.
 
+kubefork documentation ([en](./docs/kubefork-doc-en.md), [ja](./docs/kubefork-doc-ja.md))
+kubefork installation ([en](./docs/kubefork-installation-en.md), [ja](./docs/kubefork-installation-ja.md))
+
 ## Description
 
 It introduces the concept of virtual clusters as opposed to actual clusters.
