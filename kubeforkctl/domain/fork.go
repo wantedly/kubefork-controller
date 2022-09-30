@@ -22,7 +22,7 @@ func NewFork(identifier, namespace, forkManagerName string, replicaNum int32, va
 	fork := v1beta1.Fork{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "Fork",
-			APIVersion: "vsconfig.k8s.wantedly.com/v1beta1",
+			APIVersion: "fork.k8s.wantedly.com/v1beta1",
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "kubefork-" + identifier,
