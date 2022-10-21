@@ -18,13 +18,14 @@ package main
 
 import (
 	"flag"
-	ambassador "github.com/datawire/ambassador/pkg/api/getambassador.io/v2"
 	"os"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 
+	ambassador "github.com/datawire/ambassador/pkg/api/getambassador.io/v2"
+	istio "istio.io/client-go/pkg/apis/networking/v1beta1"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
@@ -32,9 +33,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
+	ddv1beta1 "github.com/wantedly/deployment-duplicator/api/v1beta1"
 	forkv1beta1 "github.com/wantedly/kubefork-controller/api/v1beta1"
 	"github.com/wantedly/kubefork-controller/controllers"
-	//+kubebuilder:scaffold:imports
 )
 
 var (
@@ -45,10 +46,12 @@ var (
 func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 	utilruntime.Must(forkv1beta1.AddToScheme(scheme))
+	utilruntime.Must(ddv1beta1.AddToScheme(scheme))
+	utilruntime.Must(istio.AddToScheme(scheme))
 
-	if os.Getenv("AMBASSADOR_ENABLED") == "true" {
-		utilruntime.Must(ambassador.AddToScheme(scheme))
-	}
+	// TODO: make opt-in to the Ambassador API
+	utilruntime.Must(ambassador.AddToScheme(scheme))
+
 	//+kubebuilder:scaffold:scheme
 }
 
