@@ -12,14 +12,31 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Build and push docker image
-        uses: docker/build-push-action@v1
+      - uses: actions/checkout@v4
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
         with:
-          username: ${{ secrets.DOCKER_USERNAME_FOR_QUAY_WANTEDLY_PUBLIC_REPO }}
-          password: ${{ secrets.DOCKER_PASSWORD_FOR_QUAY_WANTEDLY_PUBLIC_REPO }}
-          repository: wantedly/kubefork-controller
-          registry: quay.io
-          tags: ${{ github.sha }}
-          tag_with_ref: true
-          tag_with_sha: true
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: 096233016669.dkr.ecr.ap-northeast-1.amazonaws.com/wantedly/kubefork-controller
+          tags: |
+            type=raw,value=${{ github.sha }}
+            type=sha
+            type=ref,event=branch
+            type=ref,event=tag
+      - name: Build and push docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
