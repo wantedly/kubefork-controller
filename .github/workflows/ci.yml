@@ -6,13 +6,13 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-go@v3
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
       - run: make test
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v7
       - name: Build and push docker image
         uses: docker/build-push-action@v1
         with:
