@@ -1,0 +1,11 @@
+{
+  "extends": [
+    "local>wantedly/renovate-config:base",
+    "local>wantedly/renovate-config:go-automerge"
+  ],
+  "labels": ["dependencies"],
+  "postUpdateOptions": [
+    "gomodTidy",
+    "gomodUpdateImportPaths"
+  ]
+}
